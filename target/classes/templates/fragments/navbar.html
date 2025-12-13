@@ -1,0 +1,29 @@
+<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-light fixed-top"
+    style="background: rgba(255,255,255,0.8); backdrop-filter: blur(10px);">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary d-flex align-items-center gap-2" href="/">
+            ATS Parser
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item"><a class="nav-link fw-semibold" href="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link fw-semibold" href="/create-resume">Create Resume</a></li>
+                <li class="nav-item"><a class="nav-link fw-semibold" href="/create-cover-letter">Cover Letter</a></li>
+                <li class="nav-item"><a class="nav-link fw-semibold" href="/blogs">Blogs</a></li>
+                <li class="nav-item"><a class="nav-link fw-semibold" href="/contact">Contact</a></li>
+                <li class="nav-item position-relative">
+                    <a class="nav-link fw-semibold" href="/shortlist">
+                        Shortlist
+                        <span id="shortlist-counter" class="badge bg-danger rounded-pill ms-1"
+                            style="display: none; font-size: 0.7rem;">0</span>
+                    </a>
+                </li>
+                <li class="nav-item"><a class="nav-link fw-semibold btn btn-sm btn-primary text-white px-3 ms-3"
+                        href="/login">Login</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>

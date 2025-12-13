@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Shortlisted Resumes | ATS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <div class="container py-5 mt-5">
+        <div class="text-center mb-5 animate-pop-in">
+            <h2 class="text-gradient fw-bold display-4">Shortlisted Resumes</h2>
+            <p class="text-muted lead">Your selected candidates</p>
+        </div>
+
+        <div id="shortlist-container" class="row justify-content-center">
+            <div class="col-lg-10">
+                <!-- Shortlisted resumes will be loaded here by JavaScript -->
+            </div>
+        </div>
+
+        <div id="empty-message" class="text-center mt-5" style="display: none;">
+            <div class="glass-card" style="max-width: 500px; margin: 0 auto;">
+                <h4 class="text-muted mb-3">No resumes shortlisted yet</h4>
+                <p>Click the "Shortlist" button on resumes to add them here</p>
+                <a href="/" class="btn-modern mt-3">
+                    Upload Resumes
+                </a>
+            </div>
+        </div>
+
+        <div class="text-center mt-5" id="action-buttons" style="display: none;">
+            <button onclick="clearShortlist()" class="btn btn-outline-danger me-3">
+                Clear All
+            </button>
+            <a href="/" class="btn-modern">
+                Upload More Resumes
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script>
+        function loadShortlist() {
+            const shortlist = JSON.parse(localStorage.getItem('shortlist') || '[]');
+            const container = document.getElementById('shortlist-container').querySelector('.col-lg-10');
+            const emptyMessage = document.getElementById('empty-message');
+            const actionButtons = document.getElementById('action-buttons');
+
+            if (shortlist.length === 0) {
+                emptyMessage.style.display = 'block';
+                actionButtons.style.display = 'none';
+                return;
+            }
+
+            emptyMessage.style.display = 'none';
+            actionButtons.style.display = 'block';
+
+            container.innerHTML = shortlist.map((resume, index) => `
+                <div class="glass-card mb-4 animate-fade-in-up delay-${((index % 4 + 1) * 100)}">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5 class="card-title text-primary fw-bold mb-0">
+                            ${resume.file}
+                        </h5>
+                        <div class="d-flex gap-2 align-items-center">
+                            <span class="badge-modern badge-success">
+                                Score: ${resume.score}/10
+                            </span>
+                            <button class="btn btn-sm btn-danger" onclick="removeFromShortlist('${resume.file}')">
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <p class="mb-1 text-muted small">Best Matched Role</p>
+                            <div class="highlight-box d-inline-block">
+                                ${resume.role}
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <p class="mb-1 text-muted small">Matched Skills</p>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span class="highlight-box">${resume.skills}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-end mt-3 pt-3 border-top">
+                        <a href="/resume-details?file=${encodeURIComponent(resume.file)}" class="btn btn-sm btn-primary">
+                            View Resume
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+
+            updateShortlistCounter();
+        }
+
+        function removeFromShortlist(filename) {
+            if (!confirm('Remove this resume from shortlist?')) return;
+
+            let shortlist = JSON.parse(localStorage.getItem('shortlist') || '[]');
+            shortlist = shortlist.filter(item => item.file !== filename);
+            localStorage.setItem('shortlist', JSON.stringify(shortlist));
+
+            loadShortlist();
+            showToast('Resume removed from shortlist');
+        }
+
+        function clearShortlist() {
+            if (!confirm('Clear all shortlisted resumes?')) return;
+
+            localStorage.removeItem('shortlist');
+            loadShortlist();
+            showToast('Shortlist cleared');
+        }
+
+        function updateShortlistCounter() {
+            const shortlist = JSON.parse(localStorage.getItem('shortlist') || '[]');
+            const counter = document.getElementById('shortlist-counter');
+            if (counter) {
+                counter.textContent = shortlist.length;
+                counter.style.display = shortlist.length > 0 ? 'inline' : 'none';
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #10b981, #059669);
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 0.75rem;
+                box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+                z-index: 9999;
+                animation: slideIn 0.3s ease;
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+
+        // Load shortlist on page load
+        document.addEventListener('DOMContentLoaded', loadShortlist);
+    </script>
+
+    <style>
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+    </style>
+</body>
+
+</html>
