@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>spring.ai - Scanner</title>
+    <link rel="stylesheet" th:href="@{/css/style.css?v=3}">
+</head>
+
+<body>
+    <div class="container">
+        <header class="site-header">
+            <a href="/" class="logo">spring.ai</a>
+            <nav class="navbar">
+                <a href="/" class="active">UPLOAD</a>
+                <a href="/results">RESULTS</a>
+                <a href="/shortlist">SHORTLIST</a>
+            </nav>
+        </header>
+
+        <div class="text-center mb-5">
+            <p class="text-muted">Automated Resume Matching Engine</p>
+        </div>
+
+        <div class="glass-card mx-auto" style="max-width: 600px;">
+            <h2>Analyze Resumes</h2>
+            <p class="text-muted mb-4">Upload PDF or DOCX files to initiate AI-based ranking.</p>
+
+            <form method="POST" enctype="multipart/form-data" action="/upload">
+                <input type="file" name="files" multiple required class="form-control-modern mb-4">
+                <button type="submit" class="btn-primary w-100">Start Analysis</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

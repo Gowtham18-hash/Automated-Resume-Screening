@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>spring.ai - Details</title>
+    <link rel="stylesheet" th:href="@{/css/style.css?v=3}">
+</head>
+
+<body>
+    <div class="container">
+        <header class="site-header">
+            <a href="/" class="logo">spring.ai</a>
+            <nav class="navbar">
+                <a href="/">UPLOAD</a>
+                <a href="/results">RESULTS</a>
+                <a href="/shortlist">SHORTLIST</a>
+            </nav>
+        </header>
+
+        <div class="glass-card mb-5">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--text-color); padding-bottom: 1rem; margin-bottom: 2rem;">
+                <h2 th:text="${resume.filename}" style="margin: 0; font-size: 1.5rem;">FILENAME</h2>
+                <span class="badge-modern badge-success">
+                    MATCH SCORE: <span th:text="${resume.score}">0</span>%
+                </span>
+            </div>
+
+            <div
+                style="background: var(--ash-light); color: var(--text-color); padding: 2rem; border-radius: 4px; border: 1px solid var(--border-color); white-space: pre-wrap; font-family: 'Courier New', Courier, monospace; line-height: 1.6; max-height: 500px; overflow-y: auto;">
+                <p th:text="${resume.content}" class="mb-0">Resume content goes here...</p>
+            </div>
+
+            <div style="margin-top: 3rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem;">
+                <div class="highlight-box p-3">
+                    <p class="text-muted small fw-bold mb-1">MATCHED SKILLS</p>
+                    <p th:text="${resume.skills}" class="mb-0">SKILLS</p>
+                </div>
+                <div class="highlight-box p-3">
+                    <p class="text-muted small fw-bold mb-1">ACADEMIC METRIC / CGPA</p>
+                    <p th:text="${resume.cgpa}" class="mb-0">CGPA</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <a href="/shortlist" class="btn-secondary">Back to Shortlist</a>
+        </div>
+    </div>
+</body>
+
+</html>

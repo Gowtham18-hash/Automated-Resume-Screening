@@ -1,64 +1,65 @@
 package com.ats.controller;
 
-import com.ats.model.ResumeAnalysis;
-import com.ats.service.JobRoleMatcherService;
-import com.ats.service.ResumeParserService;
+import com.ats.entity.Resume;
+import com.ats.service.ResumeService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 @Controller
 public class ResumeController {
 
-    private final ResumeParserService resumeParserService;
-    private final JobRoleMatcherService jobRoleMatcherService;
+    private final ResumeService resumeService;
 
-    public ResumeController(ResumeParserService resumeParserService, JobRoleMatcherService jobRoleMatcherService) {
-        this.resumeParserService = resumeParserService;
-        this.jobRoleMatcherService = jobRoleMatcherService;
+    public ResumeController(ResumeService resumeService) {
+        this.resumeService = resumeService;
     }
 
     @GetMapping("/")
-    public String uploadPage() {
-        return "upload";
+    public String home() {
+        return "home";
     }
 
-    @PostMapping("/")
-    public String handleFileUpload(@RequestParam("files") MultipartFile[] files, Model model) {
-        List<ResumeAnalysis> parsedResumes = new ArrayList<>();
-
+    @PostMapping("/upload")
+    public String uploadResumes(@RequestParam("files") MultipartFile[] files, Model model) throws IOException {
         for (MultipartFile file : files) {
-            if (file.isEmpty()) continue;
-
-            try {
-                String text = resumeParserService.extractText(file);
-                if (!text.isEmpty()) {
-                    List<String> skills = jobRoleMatcherService.extractSkills(text);
-                    ResumeAnalysis analysis = jobRoleMatcherService.analyzeResume(file.getOriginalFilename(), skills);
-                    parsedResumes.add(analysis);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                // In a real app, handle error gracefully
-            }
+            resumeService.storeAndAnalyze(file);
         }
+        model.addAttribute("resumes", resumeService.getAllResumes());
+        return "results";
+    }
 
-        if (parsedResumes.isEmpty()) {
-            return "upload"; // Or show error message
-        }
+    @GetMapping("/results")
+    public String results(Model model) {
+        List<com.ats.entity.Resume> nonShortlisted = resumeService.getAllResumes().stream()
+                .filter(r -> !r.isShortlisted())
+                .toList();
+        model.addAttribute("resumes", nonShortlisted);
+        return "results";
+    }
 
-        // Sort by score descending
-        parsedResumes.sort(Comparator.comparingInt(ResumeAnalysis::getResumeScore).reversed());
+    @PostMapping("/shortlist/{id}")
+    public String shortlist(@PathVariable Long id) {
+        resumeService.shortlistResume(id);
+        return "redirect:/results";
+    }
 
-        model.addAttribute("parsed_resumes", parsedResumes);
-        return "index";
+    @PostMapping("/unshortlist/{id}")
+    public String unshortlist(@PathVariable Long id) {
+        resumeService.removeFromShortlist(id);
+        return "redirect:/shortlist";
+    }
+
+    @GetMapping("/resume-details/{id}")
+    public String resumeDetails(@PathVariable Long id, Model model) {
+        resumeService.getResumeById(id).ifPresent(resume -> model.addAttribute("resume", resume));
+        return "resume_details";
     }
 }

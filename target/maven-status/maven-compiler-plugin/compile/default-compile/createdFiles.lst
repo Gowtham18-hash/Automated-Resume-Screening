@@ -1,9 +1,11 @@
 com\ats\AtsApplication.class
-com\ats\controller\ResumeController.class
-com\ats\controller\NavigationController.class
 com\ats\controller\OptimizationController.class
-com\ats\model\ResumeAnalysis.class
 com\ats\controller\RatingController.class
 com\ats\controller\LoginController.class
-com\ats\service\JobRoleMatcherService.class
-com\ats\service\ResumeParserService.class
+com\ats\entity\Resume.class
+com\ats\controller\ResumeController.class
+com\ats\repository\ResumeRepository.class
+com\ats\service\ResumeService.class
+com\ats\controller\NavigationController.class
+com\ats\service\ScoringService.class
+com\ats\model\ResumeAnalysis.class

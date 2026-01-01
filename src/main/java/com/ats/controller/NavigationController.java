@@ -6,6 +6,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class NavigationController {
 
+    private final com.ats.service.ResumeService resumeService;
+
+    public NavigationController(com.ats.service.ResumeService resumeService) {
+        this.resumeService = resumeService;
+    }
+
     @GetMapping("/create-resume")
     public String createResumePage() {
         return "create_resume";
@@ -27,7 +33,8 @@ public class NavigationController {
     }
 
     @GetMapping("/shortlist")
-    public String shortlistPage() {
+    public String shortlistPage(org.springframework.ui.Model model) {
+        model.addAttribute("resumes", resumeService.getShortlistedResumes());
         return "shortlist";
     }
 
